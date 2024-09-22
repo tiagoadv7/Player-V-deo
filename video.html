@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reproduzindo Vídeo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    #videoPlayer {
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+    #videoPlayer.fade-out {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body class="bg-black flex items-center justify-center h-screen">
+  <video id="videoPlayer" class="w-full h-full" controls></video>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    // Carrega o vídeo
+    ipcRenderer.on('load-video', (event, videoUrl) => {
+      const videoPlayer = document.getElementById('videoPlayer');
+      videoPlayer.src = videoUrl;
+      videoPlayer.play();
+
+      // Fecha a janela ao terminar o vídeo
+      videoPlayer.addEventListener('ended', () => {
+        fadeOutAudioAndClose();
+      });
+    });
+
+    // Fechar ao apertar ESC
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        fadeOutAudioAndClose();
+      }
+    });
+
+    // Função para fade-out do vídeo e áudio
+    function fadeOutAudioAndClose() {
+      const videoPlayer = document.getElementById('videoPlayer');
+      let volume = videoPlayer.volume;
+      const fadeInterval = setInterval(() => {
+        if (volume > 0) {
+          volume -= 0.05;
+          videoPlayer.volume = Math.max(volume, 0);
+        } else {
+          clearInterval(fadeInterval);
+          window.close(); // Fecha a janela quando o volume é zerado
+        }
+      }, 100); // Reduz o volume gradualmente
+
+      // Fade-out do vídeo
+      videoPlayer.classList.add('fade-out');
+    }
+
+    // Aplica o fade-out e fecha
+    ipcRenderer.on('fade-out', () => {
+      fadeOutAudioAndClose();
+    });
+  </script>
+</body>
+</html>

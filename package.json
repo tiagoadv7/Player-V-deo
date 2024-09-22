@@ -1,0 +1,70 @@
+{
+  "name": "video-player",
+  "version": "1.2.24",
+  "description": "Vídeo Player",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Tiago Lima",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^25.9.8",
+    "electron-builder": "^23.6.0"
+  },
+  "dependencies": {
+    "@electron/get": "^3.1.0",
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "tailwindcss": "^3.4.12"
+  },
+  "build": {
+    "appId": "com.seuapp.reprodutorvideo",
+    "productName": "Vídeo Player",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "loading.html",
+      "index.html",
+      "video.html",
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "videoRenderer.js",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "ia32",
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "ia32",
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icons/icon.ico"
+    },
+    "nsis": {
+      "perMachine": true,
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Vídeo Player",
+      "installerIcon": "assets/icons/icon.ico",
+      "uninstallerIcon": "assets/icons/icon.ico",
+      "installerHeaderIcon": "assets/icons/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
