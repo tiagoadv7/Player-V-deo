@@ -169,7 +169,7 @@ function handleDrop(event) {
 
   // Exibe mensagem de erro se houver arquivos inválidos
   if (invalidFiles.length > 0) {
-    displayErrorMessage(`Arquivos inválidos: ${invalidFiles.join(', ')}`);
+    displayErrorMessage(`Arquivo inválido: ${invalidFiles.join(', ')}`);
   }
 }
 
