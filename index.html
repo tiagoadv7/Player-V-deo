@@ -18,15 +18,20 @@
   </div>
 
   <!-- Botão para procurar vídeos -->
-  <button id="openVideoBtn" class="px-4 py-2 bg-blue-500 hover:bg-blue-700 rounded mb-6">
+  <button id="openVideoBtn" class="px-2 py-2 bg-blue-500 hover:bg-blue-700 rounded mb-6">
     <i class="fas fa-film"></i> Procurar Vídeos
   </button>
-
-  <!-- Lista de vídeos na fila -->
-  <div id="videoList" class="w-full max-w-2xl bg-gray-800 p-2 rounded-lg">
-    <h2 class="text-lg font-bold mb-2">Lista de Vídeos</h2>
-    <ul id="queueList" class="list-disc pl-5 space-y-1 text-sm"></ul>
+<!-- Lista de vídeos na fila -->
+<div id="videoList" class="w-full max-w-2xl bg-gray-800 p-2 rounded-lg"
+ ondragover="handleDragOver(event)" 
+     ondragleave="handleDragLeave(event)" 
+     ondrop="handleDrop(event)">
+  <h2 class="text-lg font-bold mb-2">Lista de Vídeos</h2>
+  <h5>Arraste o video aqui para adicionar na fila</h5>
+  <div id="dragMessage" class="text-sm text-gray-400 text-center hidden">Solte o vídeo aqui!</div>
   </div>
+  <ul id="queueList" class="list-disc pl-5 space-y-1 text-sm"></ul>
+</div>
 
   <!-- Modal Sobre o App -->
 <div id="aboutModal" class="fixed inset-0 z-10 hidden" aria-labelledby="modal-about-title" role="dialog" aria-modal="true">
@@ -111,6 +116,6 @@
         .catch(error => console.error('Erro ao buscar author', error));
     }
   </script>
-  <script src="renderer.js"></script>
+  <script src="./renderer.js"></script>
 </body>
 </html>

@@ -26,69 +26,59 @@ openVideoBtn.addEventListener('click', () => {
 ipcRenderer.on('selected-files', (event, files) => {
   files.forEach(file => {
     if (videoQueue.length < MAX_QUEUE_SIZE) {
-      const videoElement = document.createElement('video');
-      videoElement.src = file.path;
-      videoElement.preload = 'metadata';
-
-      // Espera o vídeo carregar os metadados (duração)
-      videoElement.onloadedmetadata = () => {
-        const duration = formatTime(videoElement.duration);
-        // Função para formatar o tempo em horas, minutos e segundos
-function formatTime(seconds) {
-  const hours = Math.floor(seconds / 3600); // Converte segundos para horas
-  const minutes = Math.floor((seconds % 3600) / 60); // Minutos restantes
-  const remainingSeconds = Math.floor(seconds % 60); // Segundos restantes
-
-  // Formatação com horas, se necessário
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  } else {
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  }
-}
-
-
-        // Cria o item de vídeo na lista com o ícone, nome, duração e botão de remover
-        const videoItem = document.createElement('li');
-        videoItem.classList.add('video-item', 'flex', 'justify-between', 'items-center', 'bg-gray-800', 'p-1', 'rounded-lg', 'mb-2', 'cursor-pointer');
-        videoItem.dataset.path = file.path;  // Armazena o caminho do vídeo no dataset
-
-        videoItem.innerHTML = `
-        <div class="flex justify-between items-center w-full max-w-2xl rounded mb-1 p-1 bg-gray-500 hover:bg-blue-500 bg-opacity-50 transition-opacity">
-          <div class="flex items-center">
-            <i class="fas fa-video mr-2"></i> 
-            <span>${file.name}</span>
-          </div>
-          <div class="flex items-center space-x2">
-            <span>${duration}</span>
-            <button class="remove-btn w-full mx-1 text-white hover:text-red-600" data-path="${file.path}">
-              <i class="fas fa-xmark"></i>
-            </button>
-          </div>
-        </div>
-      `;
-      
-
-        // Adiciona evento de clique para abrir o vídeo no segundo monitor
-        videoItem.addEventListener('click', (e) => {
-          if (!e.target.classList.contains('remove-btn') && !e.target.closest('.remove-btn')) {
-            ipcRenderer.send('play-video', file.path); // Se o clique não foi no botão de remover
-          }
-        });
-
-        // Adiciona evento de remoção ao botão de lixeira
-        const removeBtn = videoItem.querySelector('.remove-btn');
-        removeBtn.addEventListener('click', () => {
-          removeVideoFromQueue(file.path);  // Remove o vídeo da fila e da interface
-        });
-
-        // Adiciona o vídeo à fila e exibe na lista
-        videoList.appendChild(videoItem);
-        videoQueue.push({ name: file.name, path: file.path });
-      };
+      addVideoToQueue(file.path, file.name);
     }
   });
 });
+
+// Função para adicionar vídeo à fila
+function addVideoToQueue(path, name) {
+  const videoElement = document.createElement('video');
+  videoElement.src = path;
+  videoElement.preload = 'metadata';
+
+  // Espera o vídeo carregar os metadados (duração)
+  videoElement.onloadedmetadata = () => {
+    const duration = formatTime(videoElement.duration);
+
+    // Cria o item de vídeo na lista com o ícone, nome, duração e botão de remover
+    const videoItem = document.createElement('li');
+    videoItem.classList.add('video-item', 'flex', 'justify-between', 'items-center', 'bg-gray-800', 'p-1', 'rounded-lg', 'mb-2', 'cursor-pointer');
+    videoItem.dataset.path = path;  // Armazena o caminho do vídeo no dataset
+
+    videoItem.innerHTML = `
+      <div class="flex justify-between items-center w-full max-w-2xl rounded mb-1 p-1 bg-gray-500 hover:bg-blue-500 bg-opacity-50 transition-opacity">
+        <div class="flex items-center">
+          <i class="fas fa-video mr-2"></i> 
+          <span>${name}</span>
+        </div>
+        <div class="flex items-center space-x2 ml-80">
+          <span>${duration}</span>
+          <button class="remove-btn w-full ml-2 mx-2-xl text-white hover:text-red-600" data-path="${path}">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Adiciona evento de clique para abrir o vídeo no segundo monitor
+    videoItem.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('remove-btn') && !e.target.closest('.remove-btn')) {
+        ipcRenderer.send('play-video', path); // Se o clique não foi no botão de remover
+      }
+    });
+
+    // Adiciona evento de remoção ao botão de lixeira
+    const removeBtn = videoItem.querySelector('.remove-btn');
+    removeBtn.addEventListener('click', () => {
+      removeVideoFromQueue(path);  // Remove o vídeo da fila e da interface
+    });
+
+    // Adiciona o vídeo à fila e exibe na lista
+    videoList.appendChild(videoItem);
+    videoQueue.push({ name, path });
+  };
+}
 
 // Função para remover o vídeo da fila e da lista
 function removeVideoFromQueue(videoPath) {
@@ -132,9 +122,52 @@ closeAboutModalBtn.addEventListener('click', () => {
   aboutModal.classList.add('hidden');
 });
 
-// Função para formatar o tempo em minutos e segundos
+// Função para formatar o tempo em horas, minutos e segundos
 function formatTime(seconds) {
-  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  } else {
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
 }
+
+// ----------------------- Funções de Arrastar e Soltar -----------------------
+
+// Função para lidar com o arrastar sobre a área
+function handleDragOver(event) {
+  event.preventDefault(); // Necessário para permitir o drop
+  document.getElementById('dragMessage').classList.remove('hidden');
+}
+
+// Função para lidar com a saída da área de arraste
+function handleDragLeave(event) {
+  document.getElementById('dragMessage').classList.add('hidden');
+}
+
+// Função para lidar com o drop do vídeo
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('dragMessage').classList.add('hidden');
+
+  const files = event.dataTransfer.files;
+
+  // Verifica se o arquivo é um vídeo e adiciona à lista
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    if (file.type.startsWith('video/')) {
+      addVideoToQueue(URL.createObjectURL(file), file.name);
+    } else {
+      console.log('Arquivo não é um vídeo válido:', file.name);
+    }
+  }
+}
+
+// Adiciona eventos de arrastar e soltar à área da fila de vídeos
+videoList.addEventListener('dragover', handleDragOver);
+videoList.addEventListener('dragleave', handleDragLeave);
+videoList.addEventListener('drop', handleDrop);
