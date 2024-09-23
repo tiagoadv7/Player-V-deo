@@ -8,6 +8,7 @@ const closeModalBtn = document.getElementById('closeModal');  // Botão para fec
 const aboutBtn = document.getElementById('aboutBtn'); // Botão "Sobre"
 const aboutModal = document.getElementById('aboutModal'); // Modal "Sobre o App"
 const closeAboutModalBtn = document.getElementById('closeAboutModal'); // Botão de fechar o modal
+const errorMessage = document.getElementById('errorMessage'); // Mensagem de erro
 
 // Fila de vídeos
 let videoQueue = [];
@@ -41,25 +42,24 @@ function addVideoToQueue(path, name) {
   videoElement.onloadedmetadata = () => {
     const duration = formatTime(videoElement.duration);
 
-    // Cria o item de vídeo na lista com o ícone, nome, duração e botão de remover
-    const videoItem = document.createElement('li');
-    videoItem.classList.add('video-item', 'flex', 'justify-between', 'items-center', 'bg-gray-800', 'p-1', 'rounded-lg', 'mb-2', 'cursor-pointer');
-    videoItem.dataset.path = path;  // Armazena o caminho do vídeo no dataset
+   // Cria o item de vídeo na lista com o ícone, nome, duração e botão de remover
+const videoItem = document.createElement('li');
+videoItem.classList.add('video-item', 'flex', 'justify-between', 'gap-x-4', 'py-3', 'rounded-md', 'bg-gray-800', 'hover:bg-blue-500', 'cursor-pointer', 'transition-all');
+videoItem.dataset.path = path;  // Armazena o caminho do vídeo no dataset
 
-    videoItem.innerHTML = `
-      <div class="flex justify-between items-center w-full max-w-2xl rounded mb-1 p-1 bg-gray-500 hover:bg-blue-500 bg-opacity-50 transition-opacity">
-        <div class="flex items-center">
-          <i class="fas fa-video mr-2"></i> 
-          <span>${name}</span>
-        </div>
-        <div class="flex items-center space-x2 ml-80">
-          <span>${duration}</span>
-          <button class="remove-btn w-full ml-2 mx-2-xl text-white hover:text-red-600" data-path="${path}">
-            <i class="fas fa-xmark"></i>
-          </button>
-        </div>
-      </div>
-    `;
+// Adiciona o conteúdo HTML dentro do item de vídeo
+videoItem.innerHTML = `
+  <div class="flex min-w-0 flex-auto items-center">
+    <p class="text-sm font-semibold leading-6 text-white truncate ml-2">${name}</p>
+  </div>
+  <div class="flex items-center space-x-2 mr-2">
+    <span class="text-sm text-gray-300">${duration}</span>
+    <button class="remove-btn w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center" data-path="${path}">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+`;
+
 
     // Adiciona evento de clique para abrir o vídeo no segundo monitor
     videoItem.addEventListener('click', (e) => {
@@ -154,6 +154,7 @@ function handleDrop(event) {
   document.getElementById('dragMessage').classList.add('hidden');
 
   const files = event.dataTransfer.files;
+  let invalidFiles = []; // Array para armazenar arquivos inválidos
 
   // Verifica se o arquivo é um vídeo e adiciona à lista
   for (let i = 0; i < files.length; i++) {
@@ -162,9 +163,23 @@ function handleDrop(event) {
     if (file.type.startsWith('video/')) {
       addVideoToQueue(URL.createObjectURL(file), file.name);
     } else {
-      console.log('Arquivo não é um vídeo válido:', file.name);
+      invalidFiles.push(file.name); // Adiciona arquivos inválidos ao array
     }
   }
+
+  // Exibe mensagem de erro se houver arquivos inválidos
+  if (invalidFiles.length > 0) {
+    displayErrorMessage(`Arquivos inválidos: ${invalidFiles.join(', ')}`);
+  }
+}
+
+// Função para exibir a mensagem de erro
+function displayErrorMessage(message) {
+  errorMessage.textContent = message; // Define a mensagem de erro
+  errorMessage.classList.remove('hidden'); // Exibe o erro
+  setTimeout(() => {
+    errorMessage.classList.add('hidden'); // Oculta o erro após 5 segundos
+  }, 5000);
 }
 
 // Adiciona eventos de arrastar e soltar à área da fila de vídeos

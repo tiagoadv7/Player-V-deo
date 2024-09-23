@@ -10,93 +10,105 @@
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen">
 
-  <!-- Botões adicionais fixados no topo -->
-  <div id="top-buttons" class="fixed top-0 w-full flex justify-between px-6 py-4">
-    <button id="aboutBtn" class="bg-blue-500 hover:bg-blue-700 rounded-full px-5 py-2 text-white">
-      <i class="fas fa-info-circle"></i>
+  <body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen">
+
+    <!-- Notificação de erro fixa no topo -->
+    <div id="errorMessage" class="hidden fixed top-1 left-30 w-95 rounded bg-red-600 text-white px-4 py-3 text-center z-50">
+      <span>Erro: Algo deu errado!</span>
+      <button id="closeError" class="ml-4 px-3 py-1 bg-red-800 hover:bg-red-700 rounded text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  
+    <!-- Botões adicionais fixados no topo -->
+    <div id="top-buttons" class="fixed top-0 w-full flex justify-between px-6 py-4">
+      <button id="aboutBtn" class="bg-blue-500 hover:bg-blue-700 rounded-full px-5 py-2 text-white">
+        <i class="fas fa-info-circle"></i>
+      </button>
+    </div>
+  
+    <!-- Botão para procurar vídeos -->
+    <button id="openVideoBtn" class="px-2 py-2 bg-blue-500 hover:bg-blue-700 rounded mb-6">
+      <i class="fas fa-film"></i> Procurar Vídeos
     </button>
-  </div>
-
-  <!-- Botão para procurar vídeos -->
-  <button id="openVideoBtn" class="px-2 py-2 bg-blue-500 hover:bg-blue-700 rounded mb-6">
-    <i class="fas fa-film"></i> Procurar Vídeos
-  </button>
-<!-- Lista de vídeos na fila -->
-<div id="videoList" class="w-full max-w-2xl bg-gray-800 p-2 rounded-lg"
- ondragover="handleDragOver(event)" 
-     ondragleave="handleDragLeave(event)" 
-     ondrop="handleDrop(event)">
-  <h2 class="text-lg font-bold mb-2">Lista de Vídeos</h2>
-  <h5>Arraste o video aqui para adicionar na fila</h5>
-  <div id="dragMessage" class="text-sm text-gray-400 text-center hidden">Solte o vídeo aqui!</div>
-  </div>
-  <ul id="queueList" class="list-disc pl-5 space-y-1 text-sm"></ul>
-</div>
-
-  <!-- Modal Sobre o App -->
-<div id="aboutModal" class="fixed inset-0 z-10 hidden" aria-labelledby="modal-about-title" role="dialog" aria-modal="true">
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-    <div class="flex min-h-full items-center justify-center p-4 text-center">
-      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-        <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-          <div class="flex flex-col items-center justify-center">
-            <!-- Ícone centralizado -->
-            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <i class="fas fa-info-circle text-blue-600"></i>
-            </div>
-            <!-- Texto centralizado -->
-            <div class="mt-3 text-center">
-              <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-about-title">Sobre o Aplicativo</h3>
-              <div class="mt-2">
-                  <p class="text-sm text-gray-500"><strong>Nome:</strong> YouTube Player</p>
-                  <p class="text-sm text-gray-500"><strong>Versão:</strong> <span id="versionText"></span></p>
-                  <p class="text-sm text-gray-500"><strong>Autor:</strong> <span id="authorText"></span></p>
-                  <p class="text-sm text-gray-500">
-                    Este é um aplicativo que foi pensado em facilitar a vida dos sonoplastas.
-                  </p>
+  
+    <!-- Lista de vídeos na fila -->
+    <div id="videoList" class="w-full max-w-2xl bg-gray-800 p-4 rounded-lg"
+         ondragover="handleDragOver(event)" 
+         ondragleave="handleDragLeave(event)" 
+         ondrop="handleDrop(event)">
+      <h2 class="text-lg font-bold mb-2 text-white">Lista de Vídeos</h2>
+      <h5 class="text-sm text-gray-400 mb-2">Arraste o vídeo aqui para adicionar na fila</h5>
+      <div id="dragMessage" class="text-sm text-gray-400 text-center hidden">Solte o vídeo aqui!</div>
+  
+      <ul id="queueList" class="w-full space-y-2 text-sm"></ul>
+    </div>
+  
+    <!-- Modal Sobre o App -->
+    <div id="aboutModal" class="fixed inset-0 z-10 hidden" aria-labelledby="modal-about-title" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+          <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+              <div class="flex flex-col items-center justify-center">
+                <!-- Ícone centralizado -->
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                  <i class="fas fa-info-circle text-blue-600"></i>
                 </div>
+                <!-- Texto centralizado -->
+                <div class="mt-3 text-center">
+                  <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-about-title">Sobre o Aplicativo</h3>
+                  <div class="mt-2">
+                      <p class="text-sm text-gray-500"><strong>Nome:</strong> YouTube Player</p>
+                      <p class="text-sm text-gray-500"><strong>Versão:</strong> <span id="versionText"></span></p>
+                      <p class="text-sm text-gray-500"><strong>Autor:</strong> <span id="authorText"></span></p>
+                      <p class="text-sm text-gray-500">
+                        Este é um aplicativo que foi pensado <br>
+                        em facilitar a vida dos sonoplastas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <button id="closeAboutModal" type="button" class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">
+                  <i class="fas fa-xmark"></i>
+                </button>
               </div>
             </div>
           </div>
-          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-            <button id="closeAboutModal" type="button" class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">
-              <i class="fas fa-xmark"></i>
-            </button>
+        </div>
+      </div>
+  
+    <!-- Modal de Alerta -->
+    <div id="modal" class="fixed inset-0 z-10 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+      <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+              <div class="sm:flex sm:items-start">
+                <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                </div>
+                <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Limite de Vídeos Alcançado</h3>
+                  <div class="mt-2">
+                    <p class="text-sm text-gray-500">Remova um vídeo para adicionar mais.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <button id="closeModal" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Ok</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Modal de Alerta -->
-  <div id="modal" class="fixed inset-0 z-10 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Limite de Vídeos Alcançado</h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500">Remova um vídeo para adicionar mais.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-            <button id="closeModal" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Ok</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   <script>
     window.onload = function () {
         // Atualizar a versão no modal
