@@ -8,8 +8,6 @@
   <link rel="stylesheet" href="assets/fontawesome/css/all.min.css">
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
 </head>
-<body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen">
-
   <body class="bg-gray-900 text-white flex flex-col items-center justify-center h-screen">
 
     <!-- Notificação de erro fixa no topo -->
@@ -28,19 +26,20 @@
     </div>
   
     <!-- Botão para procurar vídeos -->
-    <button id="openVideoBtn" class="px-2 py-2 bg-blue-500 hover:bg-blue-700 rounded mb-6">
+    <button id="openVideoBtn" class="px-2 py-2 bg-blue-500 hover:bg-blue-700 rounded my-8">
       <i class="fas fa-film"></i> Procurar Vídeos <i class="fa-solid fa-magnifying-glass"></i>
     </button>
-  
     <!-- Lista de vídeos na fila -->
-    <div id="videoList" class="w-full max-w-2xl bg-gray-800 p-4 rounded-lg"
+    <div id="videoList" class="py-3 w-full max-w-2xl bg-gray-800 p-4 rounded-lg"
          ondragover="handleDragOver(event)" 
          ondragleave="handleDragLeave(event)" 
          ondrop="handleDrop(event)">
-      <h2 class="text-lg font-bold mb-2 text-white">Lista de Vídeos</h2>
-      <h5 class="text-sm text-gray-400 mb-2">Arraste o vídeo aqui para adicionar na fila</h5>
+      <h2 class="text-center items-center justify-center text-lg font-bold mb-2 text-white">Lista de Vídeos</h2>
+      <h5 class="text-center items-center justify-center text-sm text-gray-400 mb-8">Arraste o vídeo aqui para adicionar na fila
+        <i class="fas fa-plus-circle text-gray-400 text-sm mb-4"></i>
+      </h5>
       <div id="dragMessage" class="text-sm text-gray-400 text-center hidden">Solte o vídeo aqui!</div>
-  
+      
       <ul id="queueList" class="w-full space-y-2 text-sm"></ul>
     </div>
   
@@ -60,7 +59,7 @@
                 <div class="mt-3 text-center">
                   <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-about-title">Sobre o Aplicativo</h3>
                   <div class="mt-2">
-                      <p class="text-sm text-gray-500"><strong>Nome:</strong>Vídeo Player</p>
+                      <p class="text-sm text-gray-500"><strong>Nome:</strong> Vídeo Player</p>
                       <p class="text-sm text-gray-500"><strong>Versão:</strong> <span id="versionText"></span></p>
                       <p class="text-sm text-gray-500"><strong>Autor:</strong> <span id="authorText"></span></p>
                       <p class="text-sm text-gray-500">
