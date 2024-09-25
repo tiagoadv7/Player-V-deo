@@ -1,6 +1,6 @@
 Pensando em facilitar a reprodução de videos em segunda tela
 <br>
-![Tela InicialApp](https://github.com/user-attachments/assets/97e33003-bd43-44c4-8556-7d19553d55a9)
+![TelaiApp](https://github.com/user-attachments/assets/029df56f-c2cd-4b9e-be1e-9e778ac4cc31)
 <br>
 uma interface simples e de facil usabilidade
 <h1>Configuração Inicial do Projeto</h1>
