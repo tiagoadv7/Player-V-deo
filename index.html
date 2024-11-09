@@ -43,6 +43,27 @@
       <ul id="queueList" class="w-full space-y-2 text-sm"></ul>
     </div>
   
+
+    <!-- Barra de Controle de Vídeo -->
+<div id="videoControls" class="video-control fixed bottom-0 w-full flex justify-around items-center px-6 py-4 bg-gray-800 text-white">
+  <button id="playPauseBtn" class="bg-blue-500 hover:bg-blue-700 rounded-full px-4 py-2">
+    <i class="fas fa-play"></i>
+  </button>
+  <button id="stopBtn" class="bg-red-500 hover:bg-red-700 rounded-full px-4 py-2">
+    <i class="fas fa-stop"></i>
+  </button>
+  <button id="fadeOutBtn" class="bg-gray-500 hover:bg-gray-700 rounded-full px-4 py-2">
+    <i class="fas fa-volume-down"></i> Atenuar 20%
+  </button>
+  <button id="volumeNormalBtn" class="bg-gray-500 hover:bg-gray-700 rounded-full px-4 py-2">
+    <i class="fas fa-volume-up"></i> Volume 100%
+  </button>
+  <button id="repeatBtn" class="bg-green-500 hover:bg-green-700 rounded-full px-4 py-2">
+    <i class="fas fa-redo"></i> Repetir
+  </button>
+  
+</div>
+
     <!-- Modal Sobre o App -->
     <div id="aboutModal" class="fixed inset-0 z-10 hidden" aria-labelledby="modal-about-title" role="dialog" aria-modal="true">
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
@@ -126,6 +147,7 @@
         })
         .catch(error => console.error('Erro ao buscar author', error));
     }
+    
   </script>
   <script src="./renderer.js"></script>
 </body>

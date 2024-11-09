@@ -42,24 +42,23 @@ function addVideoToQueue(path, name) {
   videoElement.onloadedmetadata = () => {
     const duration = formatTime(videoElement.duration);
 
-   // Cria o item de vídeo na lista com o ícone, nome, duração e botão de remover
-const videoItem = document.createElement('li');
-videoItem.classList.add('video-item', 'flex', 'justify-between', 'gap-x-4', 'py-3', 'rounded-md', 'bg-gray-800', 'hover:bg-blue-500', 'cursor-pointer', 'transition-all');
-videoItem.dataset.path = path;  // Armazena o caminho do vídeo no dataset
+    // Cria o item de vídeo na lista com o ícone, nome, duração e botão de remover
+    const videoItem = document.createElement('li');
+    videoItem.classList.add('video-item', 'flex', 'justify-between', 'gap-x-4', 'py-3', 'rounded-md', 'bg-gray-800', 'hover:bg-blue-500', 'cursor-pointer', 'transition-all');
+    videoItem.dataset.path = path;  // Armazena o caminho do vídeo no dataset
 
-// Adiciona o conteúdo HTML dentro do item de vídeo
-videoItem.innerHTML = `
-  <div class="flex min-w-0 flex-auto items-center">
-    <p class="text-sm font-semibold leading-6 text-white truncate ml-2">${name}</p>
-  </div>
-  <div class="flex items-center space-x-2 mr-2">
-    <span class="text-sm text-gray-300">${duration}</span>
-    <button class="remove-btn w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center" data-path="${path}">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
-`;
-
+    // Adiciona o conteúdo HTML dentro do item de vídeo
+    videoItem.innerHTML = `
+      <div class="flex min-w-0 flex-auto items-center">
+        <p class="text-sm font-semibold leading-6 text-white truncate ml-2">${name}</p>
+      </div>
+      <div class="flex items-center space-x-2 mr-2">
+        <span class="text-sm text-gray-300">${duration}</span>
+        <button class="remove-btn w-7 h-7 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center" data-path="${path}">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
 
     // Adiciona evento de clique para abrir o vídeo no segundo monitor
     videoItem.addEventListener('click', (e) => {
@@ -186,3 +185,30 @@ function displayErrorMessage(message) {
 videoList.addEventListener('dragover', handleDragOver);
 videoList.addEventListener('dragleave', handleDragLeave);
 videoList.addEventListener('drop', handleDrop);
+
+// ----------------------- Controles de Reprodução de Vídeo -----------------------
+
+// Evento Play/Pause
+document.getElementById('playPauseBtn').addEventListener('click', () => {
+  ipcRenderer.send('video-control', { action: 'playPause' });
+});
+
+// Evento Stop
+document.getElementById('stopBtn').addEventListener('click', () => {
+  ipcRenderer.send('video-control', { action: 'stop' });
+});
+
+// Evento Atenuar Volume (20%)
+document.getElementById('fadeOutBtn').addEventListener('click', () => {
+  ipcRenderer.send('video-control', { action: 'attenuate', value: 0.8 });
+});
+
+// Evento Volume Normal (100%)
+document.getElementById('volumeNormalBtn').addEventListener('click', () => {
+  ipcRenderer.send('video-control', { action: 'volume', value: 1.0 });
+});
+
+// Evento Repetir
+document.getElementById('repeatBtn').addEventListener('click', () => {
+  ipcRenderer.send('video-control', { action: 'repeat' });
+});

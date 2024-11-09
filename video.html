@@ -62,6 +62,35 @@
     ipcRenderer.on('fade-out', () => {
       fadeOutAudioAndClose();
     });
+
+    // Recebe e aplica comandos de controle de vídeo
+    ipcRenderer.on('video-action', (event, { action, value }) => {
+      switch (action) {
+        case 'playPause':
+          if (videoPlayer.paused) {
+            videoPlayer.play();
+          } else {
+            videoPlayer.pause();
+          }
+          break;
+        case 'stop':
+          videoPlayer.close();
+          videoPlayer.currentTime = 0; // Reinicia o vídeo para o início
+          break;
+        case 'attenuate':
+          videoPlayer.volume = value; // Atenua o volume (ex: 0.8 para 80%)
+          break;
+        case 'volume':
+          videoPlayer.volume = value; // Define o volume para o valor especificado
+          break;
+        case 'repeat':
+          videoPlayer.loop = !videoPlayer.loop; // Alterna o loop do vídeo
+          break;
+        case 'seek':
+          videoPlayer.currentTime = value; // Pula para o tempo especificado
+          break;
+      }
+    });
   </script>
 </body>
 </html>

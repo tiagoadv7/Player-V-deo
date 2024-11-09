@@ -96,3 +96,8 @@ app.on('ready', () => {
     });
   });
 });
+ipcMain.on('video-control', (event, { action, value }) => {
+  if (videoWindow && !videoWindow.isDestroyed()) {
+    videoWindow.webContents.send('video-action', { action, value });
+  }
+});
