@@ -188,27 +188,106 @@ videoList.addEventListener('drop', handleDrop);
 
 // ----------------------- Controles de Reprodução de Vídeo -----------------------
 
+// Variável de estado para alternar entre Play e Pause
+let isPlaying = false;  // Começa em false para mostrar "Play" inicialmente
+
+// Volume e configurações de transição
+let currentVolume = 1.0;  // Volume inicial em 100%
+const volumeStep = 0.1;   // Passo para ajuste gradual do volume
+const volumeInterval = 100;  // Intervalo de ajuste do volume em milissegundos
+let fadeInterval;  // Variável para armazenar o intervalo de fade
+
+// Seletores
+const playPauseBtn = document.getElementById('playPauseBtn');
+const stopBtn = document.getElementById('stopBtn');
+const fadeOutBtn = document.getElementById('fadeOutBtn');
+const volumeNormalBtn = document.getElementById('volumeNormalBtn');
+const repeatBtn = document.getElementById('repeatBtn');
+
+// Função para atualizar o ícone do botão Play/Pause
+function togglePlayPauseIcon() {
+  const icon = playPauseBtn.querySelector('i');
+  if (isPlaying) {
+    icon.classList.remove('fa-play');
+    icon.classList.add('fa-pause');
+  } else {
+    icon.classList.remove('fa-pause');
+    icon.classList.add('fa-play');
+  }
+}
+
+// Função para aumentar gradativamente o volume até o máximo (1.0) e iniciar o vídeo
+function fadeInVolume() {
+  clearInterval(fadeInterval);  // Limpa qualquer fade-out em andamento
+  ipcRenderer.send('video-control', { action: 'play' });  // Inicia a reprodução ao começar o fade-in
+  
+  fadeInterval = setInterval(() => {
+    if (currentVolume < 1.0) {
+      currentVolume = Math.min(currentVolume + volumeStep, 1.0);
+      ipcRenderer.send('video-control', { action: 'volume', value: currentVolume });
+    } else {
+      clearInterval(fadeInterval);  // Para o aumento quando atinge 100%
+    }
+  }, volumeInterval);
+}
+
+// Função para diminuir gradativamente o volume até 0 (mute) e pausar o vídeo
+function fadeOutVolume(callback) {
+  clearInterval(fadeInterval);  // Limpa qualquer fade-in em andamento
+  
+  fadeInterval = setInterval(() => {
+    if (currentVolume > 0) {
+      currentVolume = Math.max(currentVolume - volumeStep, 0);
+      ipcRenderer.send('video-control', { action: 'volume', value: currentVolume });
+    } else {
+      clearInterval(fadeInterval);  // Para a diminuição quando atinge 0
+      ipcRenderer.send('video-control', { action: 'pause' });  // Pausa o vídeo após o fade-out
+      if (callback) callback();  // Executa o callback após o fade-out e pause
+    }
+  }, volumeInterval);
+}
+
 // Evento Play/Pause
-document.getElementById('playPauseBtn').addEventListener('click', () => {
+playPauseBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'playPause' });
+  
+  if (isPlaying) {
+    fadeOutVolume();  // Diminui gradualmente o volume ao dar Pause e pausa o vídeo ao fim
+  } else {
+    fadeInVolume();  // Aumenta gradualmente o volume e inicia o vídeo ao dar Play
+  }
+
+  // Alterna o estado de reprodução e atualiza o ícone
+  isPlaying = !isPlaying;
+  togglePlayPauseIcon();
 });
 
 // Evento Stop
-document.getElementById('stopBtn').addEventListener('click', () => {
-  ipcRenderer.send('video-control', { action: 'stop' });
+stopBtn.addEventListener('click', () => {
+  fadeOutVolume(() => {
+    ipcRenderer.send('video-control', { action: 'stop' });
+    ipcRenderer.send('close-window');  // Envia sinal para fechar a janela após o fade-out
+
+    // Reseta o estado de reprodução e o botão para o estado inicial
+    isPlaying = false;
+    currentVolume = 1.0;  // Restaura o volume para 100%
+    togglePlayPauseIcon();  // Atualiza o ícone para "Play"
+  });
 });
 
 // Evento Atenuar Volume (20%)
-document.getElementById('fadeOutBtn').addEventListener('click', () => {
-  ipcRenderer.send('video-control', { action: 'attenuate', value: 0.8 });
+fadeOutBtn.addEventListener('click', () => {
+  ipcRenderer.send('video-control', { action: 'attenuate', value: 0.2 });
+  currentVolume = 0.2;  // Atualiza a variável de estado do volume
 });
 
 // Evento Volume Normal (100%)
-document.getElementById('volumeNormalBtn').addEventListener('click', () => {
+volumeNormalBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'volume', value: 1.0 });
+  currentVolume = 1.0;  // Atualiza a variável de estado do volume
 });
 
 // Evento Repetir
-document.getElementById('repeatBtn').addEventListener('click', () => {
+repeatBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'repeat' });
 });
