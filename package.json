@@ -9,6 +9,10 @@
   },
   "author": "Tiago Lima",
   "license": "MIT",
+  "authorEmail": "tiagolimadbvs7@gmail.com",
+  "homepage": "https://play-sonoplastia.vercel.app/",
+  "projectUrl": "https://github.com/tiagoadv7/Player-Video",
+  "private": true,
   "devDependencies": {
     "electron": "^25.9.8",
     "electron-builder": "^23.6.0"
