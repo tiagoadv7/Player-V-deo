@@ -276,8 +276,8 @@ stopBtn.addEventListener('click', () => {
 
 // Evento Atenuar Volume (para 20%)
 fadeOutBtn.addEventListener('click', () => {
-  targetVolume = 0.2;
-  fadeOutVolume(false);  // Atenua o volume para 20%
+  targetVolume = currentVolume * 0.2;
+  fadeOutVolume(false);  // Atenua o volume para 20% do volume atual
 });
 
 // Evento Restaurar Volume para 100%

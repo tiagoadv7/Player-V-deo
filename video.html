@@ -27,84 +27,109 @@
   <script>
     const { ipcRenderer } = require('electron');
     const videoPlayer = document.getElementById('videoPlayer');
-
-    // Carrega o vídeo
+    let fadeInterval;
+  
+    // Carrega o vídeo ao receber o comando
     ipcRenderer.on('load-video', (event, videoUrl) => {
       videoPlayer.src = videoUrl;
       videoPlayer.play();
-
-      // Fecha a janela ao terminar o vídeo
+  
+      // Fecha a janela ao terminar o vídeo com fade-out
       videoPlayer.addEventListener('ended', () => {
         fadeOutAudioAndClose();
       });
     });
-
+  
     // Fechar ao apertar ESC
     window.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
         fadeOutAudioAndClose();
       }
     });
-
-    // Função para fazer o fade-out do vídeo e do áudio
+  
+    // Função para fazer o fade-out do áudio e fechar a janela
     function fadeOutAudioAndClose() {
-      // Inicia o fade-out de opacidade do vídeo
-      videoPlayer.classList.add('fade-out');
-
-      // Reduz o volume gradualmente
+      videoPlayer.classList.add('fade-out'); // Inicia o fade-out visual
       let volume = videoPlayer.volume;
-      const fadeInterval = setInterval(() => {
+  
+      // Aplica o fade-out de volume
+      fadeInterval = setInterval(() => {
         if (volume > 0) {
           volume -= 0.05;
           videoPlayer.volume = Math.max(volume, 0);
         } else {
           clearInterval(fadeInterval);
-          setTimeout(() => {
-            window.close(); // Fecha a janela quando o fade-out termina
-          }, 1000); // Espera a transição de opacidade terminar (1 segundo)
+          setTimeout(() => window.close(), 1000); // Fecha após o fade-out
         }
-      }, 100); // Reduz o volume gradualmente
+      }, 100);
     }
-
-    // Escuta para aplicar o fade-out e fechar
-    ipcRenderer.on('fade-out', () => {
-      fadeOutAudioAndClose();
-    });
-
+  
+    // Função para o fade-in do volume ao iniciar o vídeo
+    function fadeInAudio() {
+      clearInterval(fadeInterval); // Interrompe qualquer fade-out em andamento
+      let volume = 0;
+      videoPlayer.volume = volume;
+      fadeInterval = setInterval(() => {
+        if (volume < 1.0) {
+          volume = Math.min(volume + 0.05, 1.0);
+          videoPlayer.volume = volume;
+        } else {
+          clearInterval(fadeInterval);
+        }
+      }, 100);
+    }
+  
     // Recebe e aplica comandos de controle de vídeo
     ipcRenderer.on('video-action', (event, { action, value }) => {
       switch (action) {
         case 'playPause':
           if (videoPlayer.paused) {
             videoPlayer.play();
+            fadeInAudio(); // Inicia o fade-in ao dar play
           } else {
-            videoPlayer.pause();
+            fadeOutVolume(); // Aplica fade-out no áudio ao pausar
           }
           break;
-
+  
         case 'stop':
-          // Executa fade-out e reinicia o vídeo, depois fecha a janela
           fadeOutAudioAndClose();
-          videoPlayer.currentTime = 0; // Reinicia o vídeo para o início
+          videoPlayer.currentTime = 1; // Reinicia o vídeo para o início
           break;
-
+  
         case 'attenuate':
-          videoPlayer.volume = value; // Atenua o volume (ex: 0.8 para 80%)
+          videoPlayer.volume = value; // Define o volume para um valor reduzido (ex: 0.2 para 20%)
           break;
-
+  
         case 'volume':
-          videoPlayer.volume = value; // Define o volume para o valor especificado
+          videoPlayer.volume = value; // Ajusta o volume ao valor especificado
           break;
-
+  
         case 'repeat':
           videoPlayer.loop = !videoPlayer.loop; // Alterna o loop do vídeo
           break;
-
+  
         case 'seek':
           videoPlayer.currentTime = value; // Pula para o tempo especificado
           break;
       }
     });
+  
+    // Função auxiliar para o fade-out de volume sem fechar o vídeo
+    function fadeOutVolume() {
+      let volume = videoPlayer.volume;
+      clearInterval(fadeInterval);
+  
+      fadeInterval = setInterval(() => {
+        if (volume > 0) {
+          volume -= 0.05;
+          videoPlayer.volume = Math.max(volume, 0);
+        } else {
+          videoPlayer.pause();
+          clearInterval(fadeInterval);
+        }
+      }, 100);
+    }
   </script>
+  
 </body>
 </html>
