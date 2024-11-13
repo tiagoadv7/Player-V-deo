@@ -6,16 +6,22 @@
   <title>Reproduzindo Vídeo</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
+    /* Estilos para garantir a transparência */
+    body, html {
+      background-color: transparent; /* Transparência para o fundo da janela */
+    }
+
     #videoPlayer {
       opacity: 1;
-      transition: opacity 1s ease-out;
+      transition: opacity 1s ease-out; /* Transição suave de opacidade */
     }
+    
     #videoPlayer.fade-out {
-      opacity: 0;
+      opacity: 0; /* Define a opacidade para 0 no final do fade */
     }
   </style>
 </head>
-<body class="bg-black flex items-center justify-center h-screen">
+<body class="flex items-center justify-center h-screen">
   <video id="videoPlayer" class="w-full h-full" controls></video>
 
   <script>
@@ -40,8 +46,12 @@
       }
     });
 
-    // Função para fade-out do vídeo e áudio
+    // Função para fazer o fade-out do vídeo e do áudio
     function fadeOutAudioAndClose() {
+      // Inicia o fade-out de opacidade do vídeo
+      videoPlayer.classList.add('fade-out');
+
+      // Reduz o volume gradualmente
       let volume = videoPlayer.volume;
       const fadeInterval = setInterval(() => {
         if (volume > 0) {
@@ -49,12 +59,11 @@
           videoPlayer.volume = Math.max(volume, 0);
         } else {
           clearInterval(fadeInterval);
-          window.close(); // Fecha a janela quando o volume é zerado
+          setTimeout(() => {
+            window.close(); // Fecha a janela quando o fade-out termina
+          }, 1000); // Espera a transição de opacidade terminar (1 segundo)
         }
       }, 100); // Reduz o volume gradualmente
-
-      // Fade-out do vídeo
-      videoPlayer.classList.add('fade-out');
     }
 
     // Escuta para aplicar o fade-out e fechar

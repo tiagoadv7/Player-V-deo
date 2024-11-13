@@ -76,6 +76,7 @@ app.on('ready', () => {
       width: display.size.width,
       height: display.size.height,
       fullscreen: true,
+      transparent: true,
       frame: false,
       webPreferences: {
         nodeIntegration: true,

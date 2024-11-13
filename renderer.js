@@ -215,12 +215,6 @@ function togglePlayPauseIcon() {
     icon.classList.add('fa-pause');
   }
 }
-// Variáveis globais e configurações de fade
-// let fadeInterval;
-// let volumeStep = 0.05; // Define a intensidade do aumento/redução de volume
-// let volumeInterval = 100; // Define a frequência do aumento/redução de volume em ms
-// let currentVolume = 1.0; // Volume inicial em 100%
-// let isPlaying = false;
 
 // Função para aumentar o volume gradualmente até o nível atual do `targetVolume`
 function fadeInVolume() {
@@ -258,9 +252,9 @@ playPauseBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'playPause' });
   
   if (isPlaying) {
-    fadeOutVolume();  // Gradualmente diminui o volume até o nível desejado ao pausar
+    fadeInVolume();  // Gradualmente diminui o volume até o nível desejado ao pausar
   } else {
-    fadeInVolume();  // Aumenta o volume ao reproduzir
+    fadeOutVolume();  // Aumenta o volume ao reproduzir
   }
 
   isPlaying = !isPlaying;
