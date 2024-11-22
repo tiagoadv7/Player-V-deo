@@ -24,7 +24,7 @@ app.on('ready', () => {
     // Criar a janela principal
     mainWindow = new BrowserWindow({
       width: 800,
-      height: 600,
+      height: 810,
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
         nodeIntegration: true,
@@ -76,6 +76,7 @@ app.on('ready', () => {
       width: display.size.width,
       height: display.size.height,
       fullscreen: true,
+      transparent: true,
       frame: false,
       webPreferences: {
         nodeIntegration: true,

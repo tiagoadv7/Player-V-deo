@@ -12,7 +12,7 @@ const errorMessage = document.getElementById('errorMessage'); // Mensagem de err
 
 // Fila de vídeos
 let videoQueue = [];
-const MAX_QUEUE_SIZE = 5;  // Limite de vídeos na fila
+const MAX_QUEUE_SIZE = 8;  // Limite de vídeos na fila
 
 // Quando o botão for clicado, abre o diálogo para selecionar vídeos
 openVideoBtn.addEventListener('click', () => {
@@ -188,27 +188,108 @@ videoList.addEventListener('drop', handleDrop);
 
 // ----------------------- Controles de Reprodução de Vídeo -----------------------
 
-// Evento Play/Pause
-document.getElementById('playPauseBtn').addEventListener('click', () => {
+// Variável de estado para alternar entre Play e Pause
+let isPlaying = false;  // Começa em false para mostrar "Play" inicialmente
+
+// Volume e configurações de transição
+let currentVolume = 1.0;  // Volume inicial em 100%
+const volumeStep = 0.1;   // Passo para ajuste gradual do volume
+const volumeInterval = 100;  // Intervalo de ajuste do volume em milissegundos
+let fadeInterval;  // Variável para armazenar o intervalo de fade
+
+// Seletores
+const playPauseBtn = document.getElementById('playPauseBtn');
+const stopBtn = document.getElementById('stopBtn');
+const fadeOutBtn = document.getElementById('fadeOutBtn');
+const volumeNormalBtn = document.getElementById('volumeNormalBtn');
+const repeatBtn = document.getElementById('repeatBtn');
+
+// Função para atualizar o ícone do botão Play/Pause
+function togglePlayPauseIcon() {
+  const icon = playPauseBtn.querySelector('i');
+  if (isPlaying) {
+    icon.classList.remove('fa-pause');
+    icon.classList.add('fa-play');
+  } else {
+    icon.classList.remove('fa-play');
+    icon.classList.add('fa-pause');
+  }
+}
+
+// Função para aumentar o volume gradualmente até o nível atual do `targetVolume`
+function fadeInVolume(targetVolume = 1.0) {
+  clearInterval(fadeInterval);  // Interrompe qualquer fade-out em andamento
+
+  fadeInterval = setInterval(() => {
+    if (currentVolume < 1.0) { // Volume alvo é 100% (1.0)
+      currentVolume = Math.min(currentVolume + 0.02, 1.0); // Incrementa suavemente o volume em 0.02
+      ipcRenderer.send('video-control', { action: 'volume', value: currentVolume }); // Aplica o novo volume
+    } else {
+      clearInterval(fadeInterval); // Interrompe o fade-in quando atinge 100%
+    }
+  }, 50); // Intervalo de 50ms para atualizações suaves
+}
+// Função para diminuir o volume gradualmente até 0 ao pausar ou parar
+function fadeOutVolume(targetVolume = 0, stopAfterFade = false, callback) {
+  clearInterval(fadeInterval); // Interrompe qualquer fade-in em andamento
+
+  fadeInterval = setInterval(() => {
+    if (currentVolume > targetVolume) {
+      currentVolume = Math.max(currentVolume - 0.01, targetVolume); // Reduz suavemente o volume
+      ipcRenderer.send('video-control', { action: 'volume', value: currentVolume });
+    } else {
+      clearInterval(fadeInterval); // Interrompe o fade-out quando atinge o volume alvo
+      if (stopAfterFade) ipcRenderer.send('video-control', { action: 'pause' }); // Pausa após o fade-out
+      if (callback) callback(); // Executa o callback após o fade-out
+    }
+  }, 50); // Intervalo reduzido para suavidade
+}
+// Função para iniciar o volume baixo e fazer fade-in ao pressionar Play
+function startPlayWithFadeIn() {
+  clearInterval(fadeInterval); // Interrompe qualquer fade-out em andamento
+  currentVolume = 0; // Garante que o volume inicial seja zero
+  ipcRenderer.send('video-control', { action: 'volume', value: currentVolume }); // Aplica o volume inicial
+
+}
+
+// Modificação no evento Play/Pause para utilizar o efeito de fade-in suave ao iniciar
+playPauseBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'playPause' });
+
+  if (isPlaying) {
+    fadeOutVolume(0);  // Diminui o volume ao pausar
+  } else {
+    startPlayWithFadeIn();  // Aumenta o volume suavemente ao iniciar o play
+  }
+
+  isPlaying = !isPlaying;
+  togglePlayPauseIcon();
 });
 
 // Evento Stop
-document.getElementById('stopBtn').addEventListener('click', () => {
-  ipcRenderer.send('video-control', { action: 'stop' });
+stopBtn.addEventListener('click', () => {
+  fadeOutVolume(0, true, () => {
+    ipcRenderer.send('video-control', { action: 'stop' });
+    ipcRenderer.send('close-window');  // Fecha a janela após o fade-out
+
+    // Reseta o estado para o próximo uso
+    isPlaying = false;
+    currentVolume = 1.0;  // Define o volume inicial ao máximo para o próximo play
+    togglePlayPauseIcon();
+  });
 });
 
-// Evento Atenuar Volume (20%)
-document.getElementById('fadeOutBtn').addEventListener('click', () => {
-  ipcRenderer.send('video-control', { action: 'attenuate', value: 0.8 });
+// Evento Atenuar Volume (para 20%)
+fadeOutBtn.addEventListener('click', () => {
+  fadeOutVolume(currentVolume * 0.2);  // Atenua o volume para 20% do volume atual
 });
 
-// Evento Volume Normal (100%)
-document.getElementById('volumeNormalBtn').addEventListener('click', () => {
-  ipcRenderer.send('video-control', { action: 'volume', value: 1.0 });
+// Evento Restaurar Volume para 100%
+volumeNormalBtn.addEventListener('click', () => {
+  fadeInVolume(1.0);  // Restaura o volume ao máximo
 });
 
 // Evento Repetir
-document.getElementById('repeatBtn').addEventListener('click', () => {
+repeatBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'repeat' });
 });
