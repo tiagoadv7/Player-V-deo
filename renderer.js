@@ -221,39 +221,45 @@ function fadeInVolume(targetVolume = 1.0) {
   clearInterval(fadeInterval);  // Interrompe qualquer fade-out em andamento
 
   fadeInterval = setInterval(() => {
-    if (currentVolume < targetVolume) {
-      currentVolume = Math.min(currentVolume + volumeStep, targetVolume);
-      ipcRenderer.send('video-control', { action: 'volume', value: currentVolume });
+    if (currentVolume < 1.0) { // Volume alvo é 100% (1.0)
+      currentVolume = Math.min(currentVolume + 0.02, 1.0); // Incrementa suavemente o volume em 0.02
+      ipcRenderer.send('video-control', { action: 'volume', value: currentVolume }); // Aplica o novo volume
     } else {
-      clearInterval(fadeInterval);  // Interrompe o fade-in quando o volume desejado é atingido
+      clearInterval(fadeInterval); // Interrompe o fade-in quando atinge 100%
     }
-  }, volumeInterval);
+  }, 50); // Intervalo de 50ms para atualizações suaves
 }
-
 // Função para diminuir o volume gradualmente até 0 ao pausar ou parar
 function fadeOutVolume(targetVolume = 0, stopAfterFade = false, callback) {
-  clearInterval(fadeInterval);  // Interrompe qualquer fade-in em andamento
+  clearInterval(fadeInterval); // Interrompe qualquer fade-in em andamento
 
   fadeInterval = setInterval(() => {
     if (currentVolume > targetVolume) {
-      currentVolume = Math.max(currentVolume - volumeStep, targetVolume);
+      currentVolume = Math.max(currentVolume - 0.01, targetVolume); // Reduz suavemente o volume
       ipcRenderer.send('video-control', { action: 'volume', value: currentVolume });
     } else {
-      clearInterval(fadeInterval);  // Interrompe o fade-out quando atinge o volume alvo
-      if (stopAfterFade) ipcRenderer.send('video-control', { action: 'pause' });  // Pausa após o fade-out completo
-      if (callback) callback();  // Executa o callback após o fade-out
+      clearInterval(fadeInterval); // Interrompe o fade-out quando atinge o volume alvo
+      if (stopAfterFade) ipcRenderer.send('video-control', { action: 'pause' }); // Pausa após o fade-out
+      if (callback) callback(); // Executa o callback após o fade-out
     }
-  }, volumeInterval);
+  }, 50); // Intervalo reduzido para suavidade
+}
+// Função para iniciar o volume baixo e fazer fade-in ao pressionar Play
+function startPlayWithFadeIn() {
+  clearInterval(fadeInterval); // Interrompe qualquer fade-out em andamento
+  currentVolume = 0; // Garante que o volume inicial seja zero
+  ipcRenderer.send('video-control', { action: 'volume', value: currentVolume }); // Aplica o volume inicial
+
 }
 
-// Evento Play/Pause
+// Modificação no evento Play/Pause para utilizar o efeito de fade-in suave ao iniciar
 playPauseBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'playPause' });
 
   if (isPlaying) {
-    fadeOutVolume();  // Diminui o volume ao pausar
+    fadeOutVolume(0);  // Diminui o volume ao pausar
   } else {
-    fadeInVolume();  // Aumenta o volume ao reproduzir
+    startPlayWithFadeIn();  // Aumenta o volume suavemente ao iniciar o play
   }
 
   isPlaying = !isPlaying;
