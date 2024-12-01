@@ -198,35 +198,30 @@ const volumeInterval = 100;  // Intervalo de ajuste do volume em milissegundos
 let fadeInterval;  // Variável para armazenar o intervalo de fade
 
 // Seletores
-const playPauseBtn = document.getElementById('playPauseBtn');
+// const playPauseBtn = document.getElementById('playPauseBtn');
 const stopBtn = document.getElementById('stopBtn');
 const fadeOutBtn = document.getElementById('fadeOutBtn');
 const volumeNormalBtn = document.getElementById('volumeNormalBtn');
 const repeatBtn = document.getElementById('repeatBtn');
 
-// Função para atualizar o ícone do botão Play/Pause de forma consistente
-function togglePlayPauseIcon() {
-  const icon = playPauseBtn.querySelector('i');
+const playPauseBtn = document.getElementById('playPauseBtn');
+    // const video = document.getElementById('myVideo');
+    let isPaused = true;
 
-  // Verifica se o vídeo está em reprodução e atualiza o ícone accordingly
-  if (isPlaying) {
-      icon.classList.remove('fa-play'); // Remove a classe 'fa-play'
-      icon.classList.add('fa-pause'); // Adiciona a classe 'fa-pause'
-  } else {
-      icon.classList.remove('fa-pause'); // Remove a classe 'fa-pause'
-      icon.classList.add('fa-play'); // Adiciona a classe 'fa-play'
-  }
-}
+    // Função simplificada para alternar o ícone
+    function togglePlayPauseIcon() {
+      const icon = playPauseBtn.querySelector('i');
+      icon.classList.toggle('fa-play');
+      icon.classList.toggle('fa-pause');
+    }
 
-// Evento de clique no botão play/pause
-playPauseBtn.addEventListener('click', () => {
-  clearInterval(fadeInterval); // Interrompe qualquer fade em andamento
-  ipcRenderer.send('video-control', { action: 'pause' }); // Envia o comando de pausa diretamente
-
-  isPlaying = !isPlaying;
-  togglePlayPauseIcon();
-});
-
+    // Evento de clique no botão play/pause
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      video.paused ? video.play() : video.pause();
+      togglePlayPauseIcon();
+    });
+  
 // Função para aumentar o volume gradualmente até o nível atual do `targetVolume`
 function fadeInVolume(targetVolume = 1.0) {
   clearInterval(fadeInterval);  // Interrompe qualquer fade-out em andamento

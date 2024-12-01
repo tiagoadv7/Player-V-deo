@@ -37,14 +37,14 @@
 
       // Fecha a janela ao terminar o vídeo com fade-out
       videoPlayer.addEventListener('ended', () => {
-        fadeOutAudioAndClose();
+        fadeOutAudioAndClose(0.1);
       });
     });
 
     // Fechar ao apertar ESC
     window.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        fadeOutAudioAndClose();
+        fadeOutAudioAndClose(0.1);
       }
     });
 
@@ -112,7 +112,7 @@ ipcRenderer.on('video-action', (event, { action, value }) => {
       break;
 
     case 'stop':
-      fadeOutAudioAndClose(); // Inicia o fade-out e fecha a janela imediatamente
+      fadeOutAudioAndClose(0.1); // Inicia o fade-out e fecha a janela imediatamente
       break;
 
     case 'attenuate':
