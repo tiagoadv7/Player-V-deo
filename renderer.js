@@ -50,7 +50,7 @@ function addVideoToQueue(path, name) {
     // Adiciona o conteúdo HTML dentro do item de vídeo
     videoItem.innerHTML = `
       <div class="flex min-w-0 flex-auto items-center">
-        <p class="text-sm font-semibold leading-6 text-white truncate ml-2">${name}</p>
+        <p class="text-sm font-semibold leading-6 text-white truncate ml-2"><i class="fas fa-film"></i> ${name}</p>
       </div>
       <div class="flex items-center space-x-2 mr-2">
         <span class="text-sm text-gray-300">${duration}</span>
@@ -198,24 +198,30 @@ const volumeInterval = 100;  // Intervalo de ajuste do volume em milissegundos
 let fadeInterval;  // Variável para armazenar o intervalo de fade
 
 // Seletores
-const playPauseBtn = document.getElementById('playPauseBtn');
+// const playPauseBtn = document.getElementById('playPauseBtn');
 const stopBtn = document.getElementById('stopBtn');
 const fadeOutBtn = document.getElementById('fadeOutBtn');
 const volumeNormalBtn = document.getElementById('volumeNormalBtn');
 const repeatBtn = document.getElementById('repeatBtn');
 
-// Função para atualizar o ícone do botão Play/Pause
-function togglePlayPauseIcon() {
-  const icon = playPauseBtn.querySelector('i');
-  if (isPlaying) {
-    icon.classList.remove('fa-pause');
-    icon.classList.add('fa-play');
-  } else {
-    icon.classList.remove('fa-play');
-    icon.classList.add('fa-pause');
-  }
-}
+const playPauseBtn = document.getElementById('playPauseBtn');
+    // const video = document.getElementById('myVideo');
+    let isPaused = true;
 
+    // Função simplificada para alternar o ícone
+    function togglePlayPauseIcon() {
+      const icon = playPauseBtn.querySelector('i');
+      icon.classList.toggle('fa-play');
+      icon.classList.toggle('fa-pause');
+    }
+
+    // Evento de clique no botão play/pause
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      video.paused ? video.play() : video.pause();
+      togglePlayPauseIcon();
+    });
+  
 // Função para aumentar o volume gradualmente até o nível atual do `targetVolume`
 function fadeInVolume(targetVolume = 1.0) {
   clearInterval(fadeInterval);  // Interrompe qualquer fade-out em andamento
@@ -235,14 +241,14 @@ function fadeOutVolume(targetVolume = 0, stopAfterFade = false, callback) {
 
   fadeInterval = setInterval(() => {
     if (currentVolume > targetVolume) {
-      currentVolume = Math.max(currentVolume - 0.01, targetVolume); // Reduz suavemente o volume
+      currentVolume = Math.max(currentVolume - 0.02, targetVolume); // Reduz suavemente o volume
       ipcRenderer.send('video-control', { action: 'volume', value: currentVolume });
     } else {
       clearInterval(fadeInterval); // Interrompe o fade-out quando atinge o volume alvo
       if (stopAfterFade) ipcRenderer.send('video-control', { action: 'pause' }); // Pausa após o fade-out
       if (callback) callback(); // Executa o callback após o fade-out
     }
-  }, 50); // Intervalo reduzido para suavidade
+  }, 40); // Intervalo reduzido para suavidade
 }
 // Função para iniciar o volume baixo e fazer fade-in ao pressionar Play
 function startPlayWithFadeIn() {
@@ -257,7 +263,7 @@ playPauseBtn.addEventListener('click', () => {
   ipcRenderer.send('video-control', { action: 'playPause' });
 
   if (isPlaying) {
-    fadeOutVolume(0);  // Diminui o volume ao pausar
+    fadeOutVolume(0.2);  // Diminui o volume ao pausar
   } else {
     startPlayWithFadeIn();  // Aumenta o volume suavemente ao iniciar o play
   }

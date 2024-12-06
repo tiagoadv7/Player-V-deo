@@ -8,7 +8,7 @@ window.electronAPI.onPlayVideo((videoPath) => {
 
 // Fecha o vídeo ao terminar
 videoPlayer.addEventListener('ended', () => {
-  window.close();
+  window.close(0.1);
 });
 
 // Fecha o vídeo ao pressionar ESC

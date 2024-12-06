@@ -37,14 +37,14 @@
 
       // Fecha a janela ao terminar o vídeo com fade-out
       videoPlayer.addEventListener('ended', () => {
-        fadeOutAudioAndClose();
+        fadeOutAudioAndClose(0.1);
       });
     });
 
     // Fechar ao apertar ESC
     window.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        fadeOutAudioAndClose();
+        fadeOutAudioAndClose(0.1);
       }
     });
 
@@ -93,60 +93,63 @@
       fadeInAudio(); // Inicia o fade-in ao dar play
     });
 
-    // Função para pausar com fade-out
-    videoPlayer.addEventListener('pause', () => {
-      fadeOutVolume(0); // Aplica fade-out no áudio ao pausar
-    });
+   // Função para pausar com fade-out
+videoPlayer.addEventListener('pause', () => {
+  fadeOutVolume(0.2, true); // Aplica fade-out no áudio ao pausar
+});
 
-    // Recebe e aplica comandos de controle de vídeo
-    ipcRenderer.on('video-action', (event, { action, value }) => {
-      switch (action) {
-        case 'playPause':
-          if (videoPlayer.paused) {
-            videoPlayer.play();
-            fadeInAudio(); // Inicia o fade-in ao dar play
-          } else {
-            fadeOutVolume(0); // Aplica fade-out no áudio ao pausar
-          }
-          break;
-
-        case 'stop':
-          fadeOutAudioAndClose(0); // Inicia o fade-out e fecha a janela imediatamente
-          break;
-
-        case 'attenuate':
-          videoPlayer.volume = value; // Define o volume para um valor reduzido (ex: 0.2 para 20%)
-          break;
-
-        case 'volume':
-          videoPlayer.volume = value; // Ajusta o volume ao valor especificado
-          break;
-
-        case 'repeat':
-          videoPlayer.loop = !videoPlayer.loop; // Alterna o loop do vídeo
-          break;
-
-        case 'seek':
-          videoPlayer.currentTime = value; // Pula para o tempo especificado
-          break;
+// Recebe e aplica comandos de controle de vídeo
+ipcRenderer.on('video-action', (event, { action, value }) => {
+  switch (action) {
+    case 'playPause':
+      if (videoPlayer.paused) {
+        videoPlayer.volume = 0; // Garante que o volume inicial seja zero ao retomar
+        videoPlayer.play(); // Reproduz o vídeo
+        fadeInAudio(); // Inicia o fade-in ao dar play
+      } else {
+        fadeOutVolume(0, true); // Aplica fade-out e pausa ao atingir volume 0
       }
-    });
+      break;
 
-    // Função auxiliar para o fade-out de volume sem fechar o vídeo
-    function fadeOutVolume() {
-      let volume = videoPlayer.volume;
-      clearInterval(fadeInterval);
+    case 'stop':
+      fadeOutAudioAndClose(0.1); // Inicia o fade-out e fecha a janela imediatamente
+      break;
 
-      fadeInterval = setInterval(() => {
-        if (volume > 0) {
-          volume -= 0.05;
-          videoPlayer.volume = Math.max(volume, 0);
-        } else {
-          videoPlayer.pause();
-          clearInterval(fadeInterval);
-        }
-      }, 50);
+    case 'attenuate':
+      videoPlayer.volume = value; // Define o volume para um valor reduzido (ex: 0.2 para 20%)
+      break;
+
+    case 'volume':
+      videoPlayer.volume = value; // Ajusta o volume ao valor especificado
+      break;
+
+    case 'repeat':
+      videoPlayer.loop = !videoPlayer.loop; // Alterna o loop do vídeo
+      break;
+
+    case 'seek':
+      videoPlayer.currentTime = value; // Pula para o tempo especificado
+      break;
+  }
+});
+// Função auxiliar para o fade-out de volume sem fechar o vídeo
+function fadeOutVolume(targetVolume = 0, pauseAfterFade = true) {
+  let volume = videoPlayer.volume;
+  clearInterval(fadeInterval); // Interrompe qualquer fade ativo
+
+  fadeInterval = setInterval(() => {
+    if (volume > targetVolume) {
+      volume = Math.max(volume - 0.02, targetVolume); // Reduz suavemente o volume em passos menores
+      videoPlayer.volume = volume; // Aplica o volume ao vídeo
+    } else {
+      clearInterval(fadeInterval); // Interrompe o fade-out quando o volume atinge o alvo
+      if (pauseAfterFade) {
+        videoPlayer.pause(); // Pausa o vídeo após o fade-out
+      }
     }
+  }, 40); // Intervalo menor para uma transição suave
+}
+
 </script>
 
   
